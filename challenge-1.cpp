@@ -34,16 +34,7 @@ void convertDeshtml(xmlNode *node){
 		else{
 			char *str;
 			str = (char*)curr_node->content;
-			// cout << "the texts :" << str[0] << "ends" << endl;
-			// cout << "the texts :" << str[1] << "ends" << endl;
-			// cout << "the texts :" << str[2] << "ends" << endl;
-
-			// char *str2 = strtok(str, " ");
-			// while(str2!=NULL){
-			// 	printOut();
-			// 	cout << str2;
-			// 	str2 = strtok(NULL, " ");
-			// }
+			
 			printOut();
 			cout << str;
 		}
