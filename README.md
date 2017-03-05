@@ -11,6 +11,6 @@
 - ./challenge1 input.html
 
 Output would be:
-- [{<i>}]foo [{<b><i>}]bar
+- `[{<i>}]foo [{<b><i>}]bar`
 
 ### Challenge-2 ###
