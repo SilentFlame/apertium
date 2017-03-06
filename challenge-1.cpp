@@ -29,7 +29,7 @@ void convertDeshtml(xmlNode *node){
 		}
 		else{
 			printOut();
-			cout << (char*)curr_node->content;;
+			cout << (char*)curr_node->content;
 		}
 	}
 }
