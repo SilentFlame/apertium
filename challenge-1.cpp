@@ -1,6 +1,6 @@
 #include <iostream>
 #include <stack>
-#include <string.h>
+#include <string>
 #include <libxml/parser.h>
 #include <libxml/tree.h>
 using namespace std;
@@ -28,10 +28,8 @@ void convertDeshtml(xmlNode *node){
 			tag_stack.pop();
 		}
 		else{
-			char *str;
-			str = (char*)curr_node->content;
 			printOut();
-			cout << str;
+			cout << (char*)curr_node->content;;
 		}
 	}
 }
@@ -42,7 +40,6 @@ int main(int argc, char **argv){
 	if(argc!=2){
 		return(1);
 	}
-
 	/*
      * this initialize the library and check potential ABI mismatches
      * between the version it was compiled for and the actual shared
