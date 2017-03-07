@@ -14,3 +14,33 @@ Output would be:
 - `[{<i>}]foo [{<b><i>}]bar`
 
 ### Challenge-2 ###
+
+##### To Compile and run #####
+- g++ -o challenge2 `xml2-config --cflags` challenge-2.cpp `xml2-config --libs`
+- ./challenge2 input.html
+
+Input1:
+- `<p>foo <b>bar fie <i>baz</i> fum</b> fiz</p>` <!--taken from https://github.com/unhammer/apertium/blob/3f80f35503656f70db2386c0b5316d502282a689/blank_notes.org -->
+
+Output1:
+- `[<p>]foo [{<b>}]bar fie [{<i><b>}]baz[{<b>}] fum fiz[</p>]`
+
+Input2:
+- `<div id="id1">
+  <p class="class1" id="id2">
+    <i>Hello Sir,</i>
+    <u style="italic">would you 
+    <b>like to play</b>
+    <em>football?</em></u>
+  </p>
+</div>`
+
+Output2:
+- `[<div id = "id1">]
+  [<p class = "class1" id = "id2">]
+    [{<i>}]Hello Sir,
+    [<u style = "italic">]would you 
+    [{<b>}]like to play
+    [{<em>}]football?[</u>]
+  [</p>]
+[</div>]`
