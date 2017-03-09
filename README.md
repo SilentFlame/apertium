@@ -35,12 +35,14 @@ Input2:
   </p>
 </div>`
 
-Output2:
+Updated Output2:
 - `[<div id = "id1">]
   [<p class = "class1" id = "id2">]
     [{<i>}]Hello Sir,
-    [<u style = "italic">]would you 
-    [{<b>}]like to play
-    [{<em>}]football?[</u>]
+    [{<u style = "italic">}]would you 
+    [{<b><u style = "italic">}]like to play[{<u style = "italic">}]
+    [{<em><u style = "italic">}]football?
   [</p>]
 [</div>]`
+
+- have some problem with dealing '</b>' in the input. 
