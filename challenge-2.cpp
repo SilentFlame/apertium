@@ -7,10 +7,10 @@
 #include <libxml/tree.h>
 using namespace std;
 
-stack<string> tagStack;
+stack<xmlNode *> tagStack;
 
 // a vector of all the inline tags
-char const *str[] = {"a", "b", "big", "i", "small", "tt", "abbr", "acronym", "cite", "code", "dfn","em", "kbd", "strong", "samp", "time", "var", "bdo", "br", "img", "map", "object", "q", "script", "span", "sub", "sup", "button", "input", "label", "select", "textarea"};
+char const *str[] = {"a", "b", "u", "big", "i", "small", "tt", "abbr", "acronym", "cite", "code", "dfn","em", "kbd", "strong", "samp", "time", "var", "bdo", "br", "img", "map", "object", "q", "script", "span", "sub", "sup", "button", "input", "label", "select", "textarea"};
 vector<string> tagVector(str, str + sizeof(str)/sizeof(str[0]));
 
 int isInlineTags(string tag){
@@ -30,13 +30,26 @@ void printOut(){
 	if(tagStack.size() > 0){
 		cout << "[{";
 	}
+	xmlChar *attr_val;
+
 	// this always to maintain the syntax in the output too.
-	for(stack<string> temp_stack = tagStack; !temp_stack.empty() ; temp_stack.pop()){
-		cout << "<" << temp_stack.top() << ">";
+	for(stack<xmlNode *> temp_stack = tagStack; !temp_stack.empty() ; temp_stack.pop()){
+			xmlNode *curr_node = temp_stack.top();
+			cout << "<" << curr_node->name;
+		
+		for(xmlAttr *curr_attr = curr_node->properties; curr_attr; curr_attr = curr_attr->next){
+			cout << " " << curr_attr->name << " = ";
+			attr_val = xmlNodeGetContent((xmlNode*)curr_attr);
+			cout << "\"" << attr_val << "\"";
+		}
+		
+		cout << ">";
 	}
+	
 	if(tagStack.size() > 0){
 		cout << "}]";
 	}
+
 }
 
 void convertDeshtml(xmlNode *node){
@@ -46,7 +59,7 @@ void convertDeshtml(xmlNode *node){
 		if(curr_node->type == XML_ELEMENT_NODE){
 
 			if(isInlineTags((char*)curr_node->name)){
-				tagStack.push((char*)curr_node->name);
+				tagStack.push(curr_node);
 			}
 			else{
 				xmlChar *attr_val;
