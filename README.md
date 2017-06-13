@@ -26,23 +26,23 @@ Output1:
 - `[<p>]foo [{<b>}]bar fie [{<i><b>}]baz[{<b>}] fum fiz[</p>]`
 
 Input2:
-- `<div id="id1">
+- ```<div id="id1">
   <p class="class1" id="id2">
     <i>Hello Sir,</i>
     <u style="italic">would you 
     <b>like to play</b>
     <em>football?</em></u>
   </p>
-</div>`
+</div>```
 
 Updated Output2:
-- `[<div id = "id1">]
+- ```[<div id = "id1">]
   [<p class = "class1" id = "id2">]
     [{<i>}]Hello Sir,
     [{<u style = "italic">}]would you 
     [{<b><u style = "italic">}]like to play[{<u style = "italic">}]
     [{<em><u style = "italic">}]football?
   [</p>]
-[</div>]`
+[</div>]```
 
 - have some problem with dealing `</b>` in the input. 
