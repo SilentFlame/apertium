@@ -56,22 +56,21 @@ string convertRehtml(string str){
 					i++;
 					if(str[i] == '}'){
 						i += 2;
+						break;
 					}
 					// cout << temp_str << endl;
 					// rehtmlTagStack.push(temp_str);
 				}
 				else{
 					finalStr += str[i];
-					// if(str[i+1]){
 						i++;
-					// }
 				}
 			}
 			i++;
 		}
 		else if(str[i]=='\n'){
 			finalStr += str[i];
-			// finalStr += rehtmlTagStack.top();
+			// finalStr += convertRehtmltmlTagStack.top();
 			// rehtmlTagStack.pop();
 			i++;
 		}
