@@ -109,9 +109,11 @@ void convertDeshtml(xmlNode *node, ostream& outfile){
 			// to pop when we get the closing brackets of inline tags
 			if(isInlineTags((char*)curr_node->name)){
 				tagStack.pop();
+				outfile << "[]";
 				flag = 1;
 			}
 			else{
+				outfile << "[]";
 				outfile << "[</" << curr_node->name << ">]";
 			}
 		}
@@ -212,7 +214,6 @@ int main(int argc, char **argv){
 
 	LIBXML_TEST_VERSION
 	root_element = xmlDocGetRootElement(doc);
-
 	convertDeshtml(root_element,outfile);
 	outfile<<endl;
 
@@ -223,12 +224,8 @@ int main(int argc, char **argv){
 	ifstream in("temp.txt");
 	string s((std::istreambuf_iterator<char>(in)), std::istreambuf_iterator<char>());
 	fputs(s.c_str(),output);
-	// fputs("\n",output);
 	fclose(output);
-	//print_maps();
-	// string filename = "tags_data.txt";
-	// put_in_database(filename);
-
+	
 	return 0;
 
 }

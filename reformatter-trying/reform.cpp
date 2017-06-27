@@ -5,19 +5,44 @@
 #include <typeinfo>
 #include <vector>
 #include <stack>
+#include <stdio.h>
+#include <cstdio>
+#include <cstdlib>
+
 
 using namespace std;
 
+stack<string> tagStack;
+
 string convertRehtml(string str){
 	int len = str.length();
-	int flag =0;
+	int flag = 0, start = 0;
 	string temp_str;
 	string finalStr = "";
 	int i = 0;
 	while(i < len){
-		
-		if(str[i]=='[' && str[i+1]=='<'){
+		if(i == 0 && str[i] == '[' && str[i+1] == ']'){
+			i += 2;
+		}
+		else if( i != 0 && str[i] == '[' && str[i+1] == ']'){
+			
+			while(tagStack.size()){
+				finalStr += "</";
+				finalStr += tagStack.top();
+				finalStr += ">";
+				tagStack.pop();
+			}
+			i += 2;
+		}
+		else if(str[i]=='[' && str[i+1]=='<'){
+
+			while(tagStack.size()){
+				finalStr += "</" + tagStack.top() + ">";
+				tagStack.pop();
+			}
+
 			i++;
+
 			while(str[i]!='>' && str[i+1]!=']'){
 				finalStr += str[i];
 				i++;
@@ -26,12 +51,15 @@ string convertRehtml(string str){
 			i += 2;;
 		}
 		else if(str[i]=='[' && str[i+1]=='{' && str[i+2] =='<'){
+			
+			while(tagStack.size()){
+				finalStr += "</" + tagStack.top() + ">";
+				tagStack.pop();
+			}
+
 			i+=2;
-			// cout << "Before While " << endl;
 			while(str[i] != ']'){
-				// cout << "inside While-1 " << endl;
 				temp_str = "";
-				// cout << finalStr << endl;
 				if(str[i] == '<' && flag == 0){
 					finalStr += str[i];
 					flag = 1;
@@ -51,6 +79,7 @@ string convertRehtml(string str){
 						finalStr += str[i];
 						i++;
 					}
+					tagStack.push(temp_str);
 					finalStr += str[i];
 					flag = 0;
 					i++;
@@ -58,39 +87,39 @@ string convertRehtml(string str){
 						i += 2;
 						break;
 					}
-					// cout << temp_str << endl;
-					// rehtmlTagStack.push(temp_str);
 				}
 				else{
 					finalStr += str[i];
 						i++;
 				}
 			}
-			i++;
+			
 		}
 		else if(str[i]=='\n'){
 			finalStr += str[i];
-			// finalStr += convertRehtmltmlTagStack.top();
-			// rehtmlTagStack.pop();
 			i++;
 		}
 		else{
 			finalStr += str[i];
-				i++;
+			i++;
 		}
 	}
-return finalStr;
+	while(tagStack.size()){
+		finalStr += "</" + tagStack.top() + ">";
+		tagStack.pop();
+	}
+	return finalStr;
 }
 
 
-int main() {
+int main(int argc, char **argv) {
 
- 	ifstream myfile("test.txt");
+	ifstream myfile(argv[argc-1]);
  	string line;
 
 	while(getline(myfile, line)){ 	
 		cout << convertRehtml(line) << endl;// Process line
 	}	
-
+	
 	return 0;
  }
