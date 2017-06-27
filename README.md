@@ -67,15 +67,58 @@ Updated Output2:
 
 #### Output ####
 ```
-[<div id = "id1">]
+<div id = "id1">]
   [<p class = "class1" id = "id2">]
-    [{<i>}]Hello Sir,
+    [{<i>}]Hello Sir,[]
     [{<u style = "italic">}]would you
-    [{<b><u style = "italic">}]like to play
-    [{<em><u style = "italic">}]football?
-  [</p>]
-[</div>]
+    [{<b><u style = "italic">}]like to play[]
+    [{<em><u style = "italic">}]football?[][]
+  [][</p>]
+[][</div>]
+
 ```
 
 ------
 
+### Reformatter ###
+
+##### Compile and run with(inside the reformatter-trying repo) #####
+- $> g++ --std=c++11 reform.cpp
+- $> ./a.out test.txt
+
+#### Input-1 ####
+```
+[<div id = "id1">]
+  [<p class = "class1" id = "id2">]
+    [{<i>}]Hello Sir,[]
+    [{<u style = "italic">}]would you
+    [{<b><u style = "italic">}]like to play[]
+    [{<em><u style = "italic">}]football?[][]
+  [][</p>]
+[][</div>]
+
+```
+
+#### Output-2 ####
+```
+<div id = "id1">
+  <p class = "class1" id = "id2">
+    <i>Hello Sir,</i>
+    <u style = "italic">]would you</u>
+    <b><u style = "italic">]like to play</u></b>
+    <em><u style = "italic">]football?</u></em>
+  </p>
+</div>
+```
+
+#### Input-2 ####
+```
+[{<i>}]foo [{<b><i>}]bar[][]
+```
+
+#### Output-2 ####
+```
+<i>foo </i><b><i>bar</i></b>
+```
+
+-------
