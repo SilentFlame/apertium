@@ -1,8 +1,0 @@
-[<div id = "id1">]
-  [<p class = "class1" id = "id2">]
-    [{<i>}]Hello Sir,[]
-    [{<u style = "italic">}]would you
-    [{<b><u style = "italic">}]like to play[]
-    [{<em><u style = "italic">}]football?[][]
-  [][</p>]
-[][</div>]

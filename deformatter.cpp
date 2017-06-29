@@ -5,17 +5,13 @@
 #include <algorithm>
 #include <libxml/parser.h>
 #include <libxml/tree.h>
-#include <cstring> 
 #include <string.h>
 #include <fstream>
-#include <sstream>
 #include <stdio.h>
-#include <sqlite3.h>
 #include <stdlib.h>
 
 #include <cstdio>
 #include <cstdlib>
-#include <libgen.h>
 #include <string>
 #include <getopt.h>
 

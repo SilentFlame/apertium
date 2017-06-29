@@ -1,130 +1,100 @@
-#include <iostream>
-#include <stack>
-#include <string>
-#include <vector>
-#include <algorithm>
-#include <libxml/parser.h>
-#include <libxml/tree.h>
-#include <cstring> 
-#include <string.h>
-#include <fstream>
 #include <sstream>
+#include <string> 
+#include <iostream> 
+#include <fstream>
+#include <stack>
 #include <stdio.h>
-#include <sqlite3.h>
-#include <stdlib.h>
-
 #include <cstdio>
 #include <cstdlib>
-#include <libgen.h>
-#include <string>
-#include <getopt.h>
 
-
-#ifdef _MSC_VER
-#include <io.h>
-#include <fcntl.h>
-#endif
 
 using namespace std;
 
-stack<xmlNode *> tagStack;
-stack<string> rehtmlTagStack;
-
-// a vector of all the inline tags
-char const *str[] = {"a", "b", "u", "big", "i", "small", "tt", "abbr", "acronym", "cite", "code", "dfn","em", "kbd", "strong", "samp", "time", "var", "bdo", "br", "img", "map", "object", "q", "script", "span", "sub", "sup", "button", "input", "label", "select", "textarea"};
-vector<string> tagVector(str, str + sizeof(str)/sizeof(str[0]));
-
-int isInlineTags(string tag){
-	
-	//if it's an Inline tag
-	if( find(tagVector.begin(), tagVector.end(), tag) != tagVector.end() ){
-	 	return 1;
-	}	
-	else{
-		return 0;
-	}
-}
-
-void usage(char *progname)
-{
-  wcerr << L"USAGE: " << basename(progname) << L" [input_file [output_file]]" << endl;
-  exit(EXIT_FAILURE);
-}
-
-
-void printOut(ostream& outfile, int flag){
-	
-	if(flag == 0){
-		//only when we have elements in the stack;	
-		if(tagStack.size() > 0){
-			outfile << "[{";
-		}
-		xmlChar *attr_val;
-
-		// this always to maintain the syntax in the output too.
-		for(stack<xmlNode *> temp_stack = tagStack; !temp_stack.empty() ; temp_stack.pop()){
-				xmlNode *curr_node = temp_stack.top();
-				outfile << "<" << curr_node->name;
-			
-			for(xmlAttr *curr_attr = curr_node->properties; curr_attr; curr_attr = curr_attr->next){
-				outfile << " " << curr_attr->name << " = ";
-				attr_val = xmlNodeGetContent((xmlNode*)curr_attr);
-				outfile << "\"" << attr_val << "\"";
-			}
-			
-			outfile << ">";
-		}
-		
-		if(tagStack.size() > 0){
-			outfile << "}]";
-		}
-	}	
-}
+stack<string> tagStack;
 
 string convertRehtml(string str){
 	int len = str.length();
-	int flag =0;
+	int flag = 0, start = 0;
 	string temp_str;
 	string finalStr = "";
 	int i = 0;
-	cout << "in" ;
-	while(i+1 < len){
-		if(str[i]=='[' && str[i+1]=='<'){
+	while(i < len){
+		if(i == 0 && str[i] == '[' && str[i+1] == ']'){
+			i += 2;
+		}
+		else if( i != 0 && str[i] == '[' && str[i+1] == ']'){
+			
+			while(tagStack.size()){
+				finalStr += "</";
+				finalStr += tagStack.top();
+				finalStr += ">";
+				tagStack.pop();
+			}
+			i += 2;
+		}
+		else if(str[i]=='[' && str[i+1]=='<'){
+
+			while(tagStack.size()){
+				finalStr += "</" + tagStack.top() + ">";
+				tagStack.pop();
+			}
+
 			i++;
+
 			while(str[i]!='>' && str[i+1]!=']'){
 				finalStr += str[i];
 				i++;
 			}
 			finalStr += str[i];
-			i++;
+			i += 2;;
 		}
-		else if(str[i]=='[' && str[i+1]=='{'){
+		else if(str[i]=='[' && str[i+1]=='{' && str[i+2] =='<'){
+			
+			while(tagStack.size()){
+				finalStr += "</" + tagStack.top() + ">";
+				tagStack.pop();
+			}
+
 			i+=2;
-			while(str[i]!='}' && str[i+1]!=']'){
+			while(str[i] != ']'){
 				temp_str = "";
-				flag = 0;
-				if(str[i]=='<'){
-					finalStr += str[i+1];
+				if(str[i] == '<' && flag == 0){
+					finalStr += str[i];
+					flag = 1;
 					i++;
-					while(str[i]!=' ' && flag == 0){
-						if(str[i]== ' '){
-							flag = 1;
-							break;
-						}
+				}
+				else if(str[i] == '>' && str[i+1] == '<'){
+					finalStr += str[i];
+					i++;
+				}
+				else if( str[i] == '>' && str[i+1] == '}'){
+					finalStr += str[i];
+					i+=2;
+				}
+				else if(flag == 1 ){
+					while(str[i] != ' ' && str[i] != '>'){
 						temp_str += str[i];
 						finalStr += str[i];
 						i++;
 					}
-					cout << temp_str;
-					if(isInlineTags(temp_str)){
-						rehtmlTagStack.push(temp_str);
+					tagStack.push(temp_str);
+					finalStr += str[i];
+					flag = 0;
+					i++;
+					if(str[i] == '}'){
+						i += 2;
+						break;
 					}
 				}
+				else{
+					finalStr += str[i];
+						i++;
+				}
 			}
+			
 		}
 		else if(str[i]=='\n'){
 			finalStr += str[i];
-			finalStr += " ENTER HOYA JI ";
 			i++;
 		}
 		else{
@@ -132,172 +102,22 @@ string convertRehtml(string str){
 			i++;
 		}
 	}
-return finalStr;
-}	
-
-void convertDeshtml(xmlNode *node, ostream& outfile){
-	// to have a look that we don't print the stack again after a closing tag.
-	int flag = 0;
-
-	for(xmlNode *curr_node = node ; curr_node ; curr_node = curr_node->next){
-		
-		if(curr_node->type == XML_ELEMENT_NODE){
-			flag = 0;
-			if(isInlineTags((char*)curr_node->name)){
-				tagStack.push(curr_node);
-			}
-			else{
-				xmlChar *attr_val;
-				
-				outfile << "[<" << curr_node->name;
-
-				//to print the things inside the tags. i.e id' clas and all
-				for(xmlAttr *curr_attr = curr_node->properties; curr_attr; curr_attr = curr_attr->next){
-					outfile << " " << curr_attr->name << " = ";
-					attr_val = xmlNodeGetContent((xmlNode*)curr_attr);
-					outfile << "\"" << attr_val << "\"";
-				}
-				outfile << ">]";
-			}
-
-			convertDeshtml(curr_node->children, outfile);
-			// to pop when we get the closing brackets of inline tags
-			if(isInlineTags((char*)curr_node->name)){
-				tagStack.pop();
-				flag = 1;
-			}
-			else{
-				outfile << "[</" << curr_node->name << ">]";
-			}
-		}
-		else{
-			// outfile << "yaha testing:" << curr_node->name << "XX";
-			printOut(outfile, flag);
-			outfile << (char*)curr_node->content;
-		}
+	while(tagStack.size()){
+		finalStr += "</" + tagStack.top() + ">";
+		tagStack.pop();
 	}
+	return finalStr;
 }
 
-int main(int argc, char **argv){
-	ofstream outfile ("temp.txt");
+
+int main(int argc, char **argv) {
+
+	ifstream myfile(argv[argc-1]);
+ 	string line;
+
+	while(getline(myfile, line)){ 	
+		cout << convertRehtml(line) << endl;// Process line
+	}	
 	
-	xmlDoc *doc = NULL;
-	xmlNode *root_element = NULL;
-
-	LIBXML_TEST_VERSION
-
-  if((argc-optind+1) > 3)
-  {
-    usage(argv[0]);
-  }
-
-  FILE *input, *output;
-  
-  if((argc-optind+1) == 1)
-  {
-    input = stdin;
-    output = stdout;
-    
-    char mystring [100];
-    FILE *fp;
-    fp = fopen("input.xml","w+b");
-    while(fgets(mystring,100,input) != NULL)
-    {
-    	fputs(mystring,fp);
-    }
-    fclose(fp);
- 
-    doc = xmlReadFile("input.xml",NULL,0);
-	if (doc == NULL) {
-		printf("error: could not parse file %s\n", argv[1]);
-	}
-  }
-  else if ((argc-optind+1) == 2)
-  {
-    input = fopen(argv[argc-1], "r");
-    if(!input)
-    {
-      usage(argv[0]);
-    }
-    output = stdout;
-
-    char mystring [100];
-    FILE *fp;
-    fp = fopen("input.xml","w+b");
-    while(fgets(mystring,100,input) != NULL)
-    {
-    	fputs(mystring,fp);
-    }
-    fclose(fp);
-    
-    doc = xmlReadFile("input.xml",NULL,0);
-	if (doc == NULL) {
-		printf("error: could not parse file %s\n", argv[1]);
-	}
-  }
-  else
-  {
-    input = fopen(argv[argc-2], "r");
-    output = fopen(argv[argc-1], "w");
-
-    if(!input || !output)
-    {
-      usage(argv[0]);
-    }
-        char mystring [100];
-    FILE *fp;
-    fp = fopen("input.xml","w+b");
-    while(fgets(mystring,100,input) != NULL)
-    {
-    	fputs(mystring,fp);
-    }
-    fclose(fp);
-    
-    doc = xmlReadFile("input.xml",NULL,0);
-	if (doc == NULL) {
-		printf("error: could not parse file %s\n", argv[1]);
-	}
-  }
-
-#ifdef _MSC_VER
-    _setmode(_fileno(input), _O_U8TEXT);
-    _setmode(_fileno(output), _O_U8TEXT);
-#endif
-
-
-	LIBXML_TEST_VERSION
-	root_element = xmlDocGetRootElement(doc);
-
-	convertDeshtml(root_element,outfile);
-	outfile<<endl;
-
-	xmlFreeDoc(doc);
-
-	xmlCleanupParser();
-
-	ifstream in("temp.txt");
-	string s((std::istreambuf_iterator<char>(in)), std::istreambuf_iterator<char>());
-	fputs(s.c_str(),output);
-	cout << "re PART" << endl;
-	char str[255];
-	
-	string final, line;
-	while(!in.eof()){ 	
-		getline(in, line);	
-		cout << line;
-		final += convertRehtml(line);
-	}
-
-	cout << final << endl;
-	fclose(output);
-	// ifstream in("temp.txt");
-	// string s((std::istreambuf_iterator<char>(in)), std::istreambuf_iterator<char>());
-	// fputs(s.c_str(), output);
-	// fputs("\n",output);
-	//print_maps();
-	// string filename = "tags_data.txt";
-	// put_in_database(filename);
-
 	return 0;
-
-}
+ }

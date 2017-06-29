@@ -47,13 +47,16 @@ Updated Output2:
 
 - have some problem with dealing `</b>` in the input. 
 
-### Deformatter ###
+### Deformatter and Reformatter ###
 
-##### Compile and run with #####
-- $> g++ deformatter.cpp -I/usr/include/libxml2 -lxml2
-- $> ./a.out input.html
+##### compile and run #####
 
-#### Input ####
+- $> make
+- $> ./dheshtml input.html   `or` ./rehtml test.txt
+
+#### Deformatter ####
+
+##### Input-1 #####
 ```
 <div id="id1">
   <p class="class1" id="id2">
@@ -65,7 +68,7 @@ Updated Output2:
 </div>
 ```
 
-#### Output ####
+##### Output-1 #####
 ```
 <div id = "id1">]
   [<p class = "class1" id = "id2">]
@@ -77,16 +80,21 @@ Updated Output2:
 [][</div>]
 
 ```
+##### Input-2 #####
+```
+<p>foo <b>bar fie <i>baz</i> fum</b> fiz</p>
+```
+
+##### Output-2 #####
+```
+[<p>]foo [{<b>}]bar fie [{<i><b>}]baz[] fum[] fiz[][</p>]
+```
 
 ------
 
-### Reformatter ###
+#### Reformatter ####
 
-##### Compile and run with(inside the reformatter-trying repo) #####
-- $> g++ --std=c++11 reform.cpp
-- $> ./a.out test.txt
-
-#### Input-1 ####
+##### Input-1 #####
 ```
 [<div id = "id1">]
   [<p class = "class1" id = "id2">]
@@ -99,7 +107,7 @@ Updated Output2:
 
 ```
 
-#### Output-1 ####
+##### Output-1 #####
 ```
 <div id = "id1">
   <p class = "class1" id = "id2">
@@ -111,12 +119,12 @@ Updated Output2:
 </div>
 ```
 
-#### Input-2 ####
+##### Input-2 #####
 ```
 [{<i>}]foo [{<b><i>}]bar[][]
 ```
 
-#### Output-2 ####
+##### Output-2 #####
 ```
 <i>foo </i><b><i>bar</i></b>
 ```
