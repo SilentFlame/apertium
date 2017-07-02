@@ -50,7 +50,7 @@ void usage(char *progname)
 void printOut(ostream& outfile, int flag){
 	
 	if(flag == 0){
-		//only when we have elements in the stack;	
+		// only when we have elements in the stack;	
 		if(tagStack.size() > 0){
 			outfile << "[{";
 		}
@@ -106,7 +106,6 @@ void convertDeshtml(xmlNode *node, ostream& outfile){
 			if(isInlineTags((char*)curr_node->name)){
 				tagStack.pop();
 				outfile << "[]";
-				flag = 1;
 			}
 			else{
 				outfile << "[]";
@@ -114,8 +113,12 @@ void convertDeshtml(xmlNode *node, ostream& outfile){
 			}
 		}
 		else{
-			// outfile << "yaha testing:" << curr_node->name << "XX";
-			printOut(outfile, flag);
+			// checking cases of nested inline tags.
+			string str = (char*)curr_node->content;
+			if(str[0]=='\n'){
+				flag=1;
+			}
+			printOut(outfile, flag);  
 			outfile << (char*)curr_node->content;
 		}
 	}
@@ -206,7 +209,6 @@ int main(int argc, char **argv){
     _setmode(_fileno(input), _O_U8TEXT);
     _setmode(_fileno(output), _O_U8TEXT);
 #endif
-
 
 	LIBXML_TEST_VERSION
 	root_element = xmlDocGetRootElement(doc);

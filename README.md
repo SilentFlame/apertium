@@ -87,7 +87,7 @@ Updated Output2:
 
 ##### Output-2 #####
 ```
-[<p>]foo [{<b>}]bar fie [{<i><b>}]baz[] fum[] fiz[][</p>]
+[<p>]foo [{<b>}]bar fie [{<i><b>}]baz[][{<b>}] fum[] fiz[][</p>]
 ```
 
 ------
