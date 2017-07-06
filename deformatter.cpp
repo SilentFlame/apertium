@@ -60,15 +60,18 @@ string validateXml(const std::string &html)
     int tidy_rescode=-1;
  
     // parse input
-    if(config_success)
+    if(config_success){
         tidy_rescode=tidyParseString(tidy_doc,html.c_str());
+    }
  
     // process html
-    if(tidy_rescode>=0)
+    if(tidy_rescode>=0){
         tidy_rescode=tidySaveBuffer(tidy_doc,&output_buffer);
+    }
  
-    if(tidy_rescode<0)
+    if(tidy_rescode<0){
         throw("tidy has a error: "+tidy_rescode);
+    }
  
     std::string result=(char *)output_buffer.bp;
     tidyBufFree(&output_buffer);
@@ -178,33 +181,22 @@ int main(int argc, char **argv){
   
   if((argc-optind+1) == 1)
   {
+  	cout << "One" << endl;
     input = stdin;
     output = stdout;
     
-    char mystring [100];
-    FILE *fp;
-    fp = fopen("input.xml","w+b");
-    while(fgets(mystring,100,input) != NULL)
-    {
-    	fputs(mystring,fp);
-    }
-    fclose(fp);
- 
- 	ifstream in("input.xml");
-	string s((std::istreambuf_iterator<char>(in)), std::istreambuf_iterator<char>());
-    s = validateXml(s);
-	
-    fp = fopen("final_input.xml","w+b");
-    fputs(s.c_str(),fp);
-	fclose(fp);
-    
-    doc = xmlReadFile("final_input.xml",NULL,0);
-	if (doc == NULL) {
+    string s((std::istreambuf_iterator<char>(cin)),
+   						std::istreambuf_iterator<char>());
+	s = validateXml(s);
+	doc = xmlParseMemory(s.c_str(), s.length());
+
+	if(doc == NULL){
 		printf("error: could not parse file %s\n", argv[1]);
 	}
   }
   else if ((argc-optind+1) == 2)
   {
+  	cout << "Three" << endl;
     input = fopen(argv[argc-1], "r");
     if(!input)
     {
@@ -212,25 +204,11 @@ int main(int argc, char **argv){
     }
     output = stdout;
 
-    char mystring [100];
-    FILE *fp;
-    fp = fopen("input.xml","w+b");
-    while(fgets(mystring,100,input) != NULL)
-    {
-    	fputs(mystring,fp);
-    }
-    fclose(fp);
-    
+    string s((std::istreambuf_iterator<char>(cin)),
+   						std::istreambuf_iterator<char>());
+	s = validateXml(s);
 
-    ifstream in("input.xml");
-	string s((std::istreambuf_iterator<char>(in)), std::istreambuf_iterator<char>());
-    s = validateXml(s);
-	
-    fp = fopen("final_input.xml","w+b");
-    fputs(s.c_str(),fp);
-	fclose(fp);
-    
-    doc = xmlReadFile("final_input.xml",NULL,0);
+	doc = xmlParseMemory(s.c_str(), s.length());
 	if (doc == NULL) {
 		printf("error: could not parse file %s\n", argv[1]);
 	}
@@ -244,24 +222,12 @@ int main(int argc, char **argv){
     {
       usage(argv[0]);
     }
-        char mystring [100];
-    FILE *fp;
-    fp = fopen("input.xml","w+b");
-    while(fgets(mystring,100,input) != NULL)
-    {
-    	fputs(mystring,fp);
-    }
-    fclose(fp);
     
-    ifstream in("input.xml");
-	string s((std::istreambuf_iterator<char>(in)), std::istreambuf_iterator<char>());
-    s = validateXml(s);
-	
-    fp = fopen("final_input.xml","w+b");
-    fputs(s.c_str(),fp);
-	fclose(fp);
+    string s((std::istreambuf_iterator<char>(cin)),
+   						std::istreambuf_iterator<char>());
+	s = validateXml(s);
+	doc = xmlParseMemory(s.c_str(), s.length());
 
-    doc = xmlReadFile("final_input.xml",NULL,0);
 	if (doc == NULL) {
 		printf("error: could not parse file %s\n", argv[1]);
 	}
