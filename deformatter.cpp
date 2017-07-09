@@ -52,10 +52,10 @@ string validateXml(const std::string &html)
  
     // configure tidy
     // the flags tell tidy to output xml and disable warnings
-    bool config_success=tidyOptSetBool(tidy_doc,TidyXmlOut,yes)
-                        && tidyOptSetBool(tidy_doc,TidyQuiet,yes)
-                        && tidyOptSetBool(tidy_doc,TidyNumEntities,yes)
-                        && tidyOptSetBool(tidy_doc,TidyShowWarnings,no);
+    bool config_success = tidyOptSetBool(tidy_doc,TidyXmlOut,yes)
+                        	&& tidyOptSetBool(tidy_doc,TidyQuiet,yes)
+                        	&& tidyOptSetBool(tidy_doc,TidyNumEntities,yes)
+                       		&& tidyOptSetBool(tidy_doc,TidyShowWarnings,no);
  
     int tidy_rescode=-1;
  
@@ -87,36 +87,36 @@ void usage(char *progname)
 }
 
 
-void printOut(ostream& outfile, bool noNewline){
+void printOut(bool noNewline){
 	
 	if(noNewline){
 		// only when we have elements in the stack;	
 		if(tagStack.size() > 0){
-			outfile << "[{";
+			cout << "[{";
 		}
 		xmlChar *attr_val;
 
 		// this always to maintain the syntax in the output too.
 		for(stack<xmlNode *> temp_stack = tagStack; !temp_stack.empty() ; temp_stack.pop()){
 				xmlNode *curr_node = temp_stack.top();
-				outfile << "<" << curr_node->name;
+				cout << "<" << curr_node->name;
 			
 			for(xmlAttr *curr_attr = curr_node->properties; curr_attr; curr_attr = curr_attr->next){
-				outfile << " " << curr_attr->name << " = ";
+				cout << " " << curr_attr->name << " = ";
 				attr_val = xmlNodeGetContent((xmlNode*)curr_attr);
-				outfile << "\"" << attr_val << "\"";
+				cout << "\"" << attr_val << "\"";
 			}
 			
-			outfile << ">";
+			cout << ">";
 		}
 		
 		if(tagStack.size() > 0){
-			outfile << "}]";
+			cout << "}]";
 		}
 	}	
 }
 
-void convertDeshtml(xmlNode *node, ostream& outfile){
+void convertDeshtml(xmlNode *node){
 	// to have a look that we don't print the stack again after a closing tag.
 	bool noNewline = true;
 
@@ -130,42 +130,41 @@ void convertDeshtml(xmlNode *node, ostream& outfile){
 			else{
 				xmlChar *attr_val;
 				
-				outfile << "[<" << curr_node->name;
+				cout << "[<" << curr_node->name;
 
 				//to print the things inside the tags. i.e id' clas and all
 				for(xmlAttr *curr_attr = curr_node->properties; curr_attr; curr_attr = curr_attr->next){
-					outfile << " " << curr_attr->name << " = ";
+					cout << " " << curr_attr->name << " = ";
 					attr_val = xmlNodeGetContent((xmlNode*)curr_attr);
-					outfile << "\"" << attr_val << "\"";
+					cout << "\"" << attr_val << "\"";
 				}
-				outfile << ">]";
+				cout << ">]";
 			}
 
-			convertDeshtml(curr_node->children, outfile);
+			convertDeshtml(curr_node->children);
 			// to pop when we get the closing brackets of inline tags
 			if(isInlineTags((char*)curr_node->name)){
 				tagStack.pop();
-				outfile << "[]";
+				cout << "[]";
 			}
 			else{
-				outfile << "[]";
-				outfile << "[</" << curr_node->name << ">]";
+				cout << "[]";
+				cout << "[</" << curr_node->name << ">]";
 			}
 		}
 		else{
 			// checking cases of nested inline tags.
 			string str = (char*)curr_node->content;
-			if(str[0]=='\n'){
+			if(str[0]==' ' && str[1]=='\n'){
 				noNewline=false;
 			}
-			printOut(outfile, noNewline);  
-			outfile << (char*)curr_node->content;
+			printOut(noNewline);  
+			cout << (char*)curr_node->content;
 		}
 	}
 }
 
 int main(int argc, char **argv){
-	ofstream outfile ("temp.txt");
 	
 	xmlDoc *doc = NULL;
 	xmlNode *root_element = NULL;
@@ -181,7 +180,6 @@ int main(int argc, char **argv){
   
   if((argc-optind+1) == 1)
   {
-  	cout << "One" << endl;
     input = stdin;
     output = stdout;
     
@@ -196,7 +194,6 @@ int main(int argc, char **argv){
   }
   else if ((argc-optind+1) == 2)
   {
-  	cout << "Three" << endl;
     input = fopen(argv[argc-1], "r");
     if(!input)
     {
@@ -240,18 +237,13 @@ int main(int argc, char **argv){
 
 	LIBXML_TEST_VERSION
 	root_element = xmlDocGetRootElement(doc);
-	convertDeshtml(root_element,outfile);
-	outfile<<endl;
+	convertDeshtml(root_element);
+	cout << endl;
 
 	xmlFreeDoc(doc);
 
 	xmlCleanupParser();
 
-	ifstream in("temp.txt");
-	string s((std::istreambuf_iterator<char>(in)), std::istreambuf_iterator<char>());
-	fputs(s.c_str(),output);
-	fclose(output);
-	
 	return 0;
 
 }
