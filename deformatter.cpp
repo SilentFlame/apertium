@@ -5,6 +5,7 @@
 #include <algorithm>
 #include <libxml/parser.h>
 #include <libxml/tree.h>
+#include <libxml/xmlreader.h>
 #include <string.h>
 #include <fstream>
 #include <stdio.h>
@@ -155,7 +156,7 @@ void convertDeshtml(xmlNode *node){
 		else{
 			// checking cases of nested inline tags.
 			string str = (char*)curr_node->content;
-			if(str[0]==' ' && str[1]=='\n'){
+			if(str[0]==' ' && str[1]=='\n' || str[0] == '\n'){
 				noNewline=false;
 			}
 			printOut(noNewline);  
@@ -185,12 +186,18 @@ int main(int argc, char **argv){
     
     string s((std::istreambuf_iterator<char>(cin)),
    						std::istreambuf_iterator<char>());
-	s = validateXml(s);
-	doc = xmlParseMemory(s.c_str(), s.length());
+	
 
-	if(doc == NULL){
+	if(xmlReaderForMemory(s.c_str(), s.length(), NULL, NULL, 64)){
+		doc = xmlParseMemory(s.c_str(), s.length());
+	}
+
+	else{
+		s = validateXml(s);
+		doc = xmlParseMemory(s.c_str(), s.length());	
 		printf("error: could not parse file %s\n", argv[1]);
 	}
+
   }
   else if ((argc-optind+1) == 2)
   {

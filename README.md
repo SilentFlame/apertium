@@ -52,7 +52,7 @@ Updated Output2:
 ##### compile and run #####
 
 - $> make
-- $> ./dheshtml input.html   `or` ./rehtml test.txt
+- $> cat/echo file/"input string" |./dheshtml `or` ./rehtml
 
 #### Deformatter ####
 
@@ -130,3 +130,9 @@ Updated Output2:
 ```
 
 -------
+
+### Testing ###
+
+##### To run #####
+- stay in the ./apertium directory.
+- $> python run_test.py

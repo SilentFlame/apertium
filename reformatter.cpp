@@ -111,13 +111,12 @@ string convertRehtml(string str){
 
 
 int main(int argc, char **argv) {
-
-	ifstream myfile(argv[argc-1]);
- 	string line;
-
-	while(getline(myfile, line)){ 	
-		cout << convertRehtml(line) << endl;// Process line
-	}	
 	
+	string s((std::istreambuf_iterator<char>(cin)),
+	  				std::istreambuf_iterator<char>());
+
+	cout << convertRehtml(s);
+
 	return 0;
- }
+
+}
